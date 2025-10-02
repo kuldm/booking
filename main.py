@@ -26,7 +26,6 @@ def get_hotels(
             continue
         hotels_.append(hotel)
     return hotels_
-    # return [hotel for hotel in hotels if hotel["title"] == title and hotel["id"] == id]
 
 
 @app.post("/hotels")
@@ -38,6 +37,7 @@ def create_hotel(
         "id": hotels[-1]["id"] + 1,
         "title": title
     })
+    return hotels[-1]
 
 
 @app.put("/hotels/{hotel_id}")
@@ -53,7 +53,11 @@ def update_hotel(
     return hotel
 
 
-@app.patch("/hotels/{hotel_id}")
+@app.patch(
+    "/hotels/{hotel_id}",
+    summary="Частичное обновление данных об отеле",
+    description="<h2>В этой ручке мы частичного обновляем данные об отеле. Можем отправить title, а можем отправить name<h2>"
+)
 def update_patch_hotel(
         hotel_id: int,
         title: str | None = Body(None),
