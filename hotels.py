@@ -1,10 +1,16 @@
-from fastapi import Query, Body, APIRouter
+from fastapi import Query, APIRouter, Body
 
+from schemas.hotels import Hotel, HotelPATCH
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
 hotels = [
     {"id": 1, "title": "Sochi", "name": "sochi"},
-    {"id": 2, "title": "Dubai", "name": "dubai"}
+    {"id": 2, "title": "Dubai", "name": "dubai"},
+    {"id": 3, "title": "Мальдивы", "name": "maldivi"},
+    {"id": 4, "title": "Геленджик", "name": "gelendzhik"},
+    {"id": 5, "title": "Москва", "name": "moscow"},
+    {"id": 6, "title": "Казань", "name": "kazan"},
+    {"id": 7, "title": "Санкт-Петербург", "name": "spb"},
 ]
 
 
@@ -13,6 +19,8 @@ def get_hotels(
         id: int | None = Query(None, description="Айдишник"),
         title: str | None = Query(None, description="Название отеля"),
         name: str | None = Query(None, description="Какой то параметр"),
+        page: int | None = Query(1, description="Порядковый номер страницы"),
+        per_page: int | None = Query(3, description="Cколько записей выводить на каждой странице"),
 ):
     hotels_ = []
     for hotel in hotels:
@@ -23,17 +31,31 @@ def get_hotels(
         if name and hotel["name"] != name:
             continue
         hotels_.append(hotel)
+    start = (page - 1) * per_page
+    stop = start + per_page
+    hotels_ = hotels_[start:stop:]
     return hotels_
 
 
 @router.post("")
 def create_hotel(
-        title: str = Body(embed=True)
+        hotel_data: Hotel = Body(
+            openapi_examples={"1": {"summary": "Сочи", "value":{
+                "title": "Отель Сочи 5 звёзд у моря",
+                "name": "sochi_u_morya",
+            }},
+                "2": {"summary": "Дубай", "value":{
+                "title": "Отель Дубай у фонтана",
+                "name": "dubi_fontain"
+            }},
+            }
+        ),
 ):
     global hotels
     hotels.append({
         "id": hotels[-1]["id"] + 1,
-        "title": title
+        "title": hotel_data.title,
+        "name": hotel_data.name,
     })
     return hotels[-1]
 
@@ -41,13 +63,13 @@ def create_hotel(
 @router.put("/{hotel_id}")
 def update_hotel(
         hotel_id: int,
-        title: str = Body(),
-        name: str = Body(),
+        hotel_data: Hotel,
+
 ):
     global hotels
     hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id]
-    hotel[0]["title"] = title
-    hotel[0]["name"] = name
+    hotel[0]["title"] = hotel_data.title
+    hotel[0]["name"] = hotel_data.name
     return hotel
 
 
@@ -58,15 +80,14 @@ def update_hotel(
 )
 def update_patch_hotel(
         hotel_id: int,
-        title: str | None = Body(None),
-        name: str | None = Body(None),
+        hotel_data: HotelPATCH
 ):
     global hotels
-    hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id]
-    if title:
-        hotel[0]["title"] = title
-    if name:
-        hotel[0]["name"] = name
+    hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
+    if hotel_data.title:
+        hotel["title"] = hotel_data.title
+    if hotel_data.name:
+        hotel["name"] = hotel_data.name
     return hotel
 
 
