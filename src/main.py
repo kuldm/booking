@@ -1,9 +1,9 @@
-from fastapi import FastAPI
-from fastapi.openapi.docs import get_swagger_ui_html
-import uvicorn
-
 import sys
 from pathlib import Path
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.openapi.docs import get_swagger_ui_html
 
 # Эта конструкция нужна чтобы определить путь текущего файла, определить его родителя (папка src) и определить родителя (папки src)
 # И добавить её в пути с которыми может работать интерпритатор. После этого интерпритатор будет понимать что такое src.
@@ -11,10 +11,8 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.api.hotels import router as router_hotels
-from src.config import settings
 
 app = FastAPI()
-print(f"{settings.DB_NAME=}")
 
 app.include_router(router_hotels)
 
