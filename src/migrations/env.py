@@ -8,6 +8,7 @@ from alembic import context
 from src.config import settings
 from src.database import Base
 from src.models.hotels import HotelsModel
+from src.models.rooms import RoomsModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -20,6 +21,7 @@ config = context.config
 # sqlalchemy.url = driver://user:pass@localhost/dbname которая задаёт url подключения к базе, и нам надо поставить свой.
 # И так как у нас асинхронное подключение к бд, а миграции работаю синхронно, такие манипуляции позволяют сделать работу
 # миграций в синхронном режиме, и не ставить дополнительных синхронных движков
+# config.set_main_option("sqlalchemy.url", f"{settings.DB_URL}?async_fallback=True")
 config.set_main_option("sqlalchemy.url", f"{settings.DB_URL}?async_fallback=True")
 
 # Interpret the config file for Python logging.
