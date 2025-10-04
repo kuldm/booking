@@ -5,9 +5,22 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from src.config import settings
+from src.database import Base
+from src.models.hotels import HotelsModel
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+
+# Асинхронные движки в алембике, они не умеют без доп махинаций прогонять миграции. Сами миграции это процесс синхроный,
+# так как не может быть такого что одна миграция паралельно с другой прогоняется, как в гите. Для этого добавляем
+# ?async_fallback=True в конце урла. и тут мы переопределяем url так как с alembic.ini есть переменная
+# sqlalchemy.url = driver://user:pass@localhost/dbname которая задаёт url подключения к базе, и нам надо поставить свой.
+# И так как у нас асинхронное подключение к бд, а миграции работаю синхронно, такие манипуляции позволяют сделать работу
+# миграций в синхронном режиме, и не ставить дополнительных синхронных движков
+config.set_main_option("sqlalchemy.url", f"{settings.DB_URL}?async_fallback=True")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -18,7 +31,8 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+# Прописываю свой класс Base и его метадату
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
