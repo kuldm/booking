@@ -2,10 +2,10 @@ from fastapi import Query, APIRouter, Body
 from sqlalchemy import insert, select, func
 
 from src.api.dependencies import PaginationDep
-from src.database import async_session_maker, engine
+from src.database import async_session_maker, engine, session
 from src.models.hotels import HotelsModel
 from src.repositories.hotels import HotelsRepository
-from src.schemas.hotels import Hotel, HotelPATCH
+from src.schemas.hotels import HotelSchema, HotelPATCHSchema
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -30,11 +30,11 @@ async def get_hotels(
 
 @router.post("")
 async def create_hotel(
-        hotel_data: Hotel = Body(
+        hotel_data: HotelSchema = Body(
             openapi_examples={"1": {"summary": "Сочи", "value": {
-                "title": "Отель Сочи 5 звёзд у моря",
-                "location": "sochi_u_morya",
-            }},
+                                   "title": "Отель Сочи 5 звёзд у моря",
+                                   "location": "sochi_u_morya",
+                              }},
                               "2": {"summary": "Дубай", "value": {
                                   "title": "Отель Дубай у фонтана",
                                   "location": "dubi_fontain"
@@ -42,17 +42,20 @@ async def create_hotel(
                               }
         ),
 ):
+    # async with async_session_maker() as session:
+    #     add_hotel_stmt = insert(HotelsModel).values(**hotel_data.model_dump())
+    #     await session.execute(add_hotel_stmt)
+    #     await session.commit()
     async with async_session_maker() as session:
-        add_hotel_stmt = insert(HotelsModel).values(**hotel_data.model_dump())
-        await session.execute(add_hotel_stmt)
+        hotel = await HotelsRepository(session).add(hotel_data)
         await session.commit()
-    return {"Status": "OK"}
+    return {"Status": "OK", "data": hotel}
 
 
 @router.put("/{hotel_id}")
 def update_hotel(
         hotel_id: int,
-        hotel_data: Hotel,
+        hotel_data: HotelSchema,
 
 ):
     global hotels
@@ -69,7 +72,7 @@ def update_hotel(
 )
 def update_patch_hotel(
         hotel_id: int,
-        hotel_data: HotelPATCH
+        hotel_data: HotelPATCHSchema
 ):
     global hotels
     hotel = [hotel for hotel in hotels if hotel["id"] == hotel_id][0]
