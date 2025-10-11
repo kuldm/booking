@@ -1,11 +1,11 @@
 from pydantic import BaseModel, Field
 
 
-class HotelSchema(BaseModel):
+class Hotel(BaseModel):
     title: str
     location: str
 
 
-class HotelPATCHSchema(BaseModel):
+class HotelPATCH(BaseModel):
     title: str | None = Field(None)
     location: str | None = Field(None)
