@@ -28,21 +28,19 @@ class BaseRepository:
         result = await self.session.execute(add_data_stmt)
         return result.scalars().one()
 
-    async def edit(self, data: BaseModel, **filter_by):
-        query = update(self.model).filter_by(**filter_by).values(**data.model_dump()).returning(self.model)
-        result = await self.session.execute(query)
-        hotel =  result.scalars().one_or_none()
-        if not hotel:
-            raise HTTPException(status_code=404, detail=f"Отель с ID {filter_by['id']} не существует")
-        return hotel
+    async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by):
+        update_stmt = (
+            update(self.model)
+            .filter_by(**filter_by)
+            .values(**data.model_dump(exclude_unset=exclude_unset)).returning(self.model)
+        )
+        await self.session.execute(update_stmt)
 
 
     async def delete(self, **filter_by):
         """Удаляет записи, соответствующие фильтру."""
-        query = delete(self.model).filter_by(**filter_by).returning(self.model)
-        result = await self.session.execute(query)
-        deleted_count = result.scalars().all()
-        if not deleted_count:
-            raise HTTPException(status_code=404, detail=f"Отель с ID {filter_by['id']} не существует")
+        delete_stmt = delete(self.model).filter_by(**filter_by).returning(self.model)
+        await self.session.execute(delete_stmt)
+
 
 
