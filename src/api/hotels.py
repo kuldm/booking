@@ -4,6 +4,7 @@ from sqlalchemy import insert, select, func
 from src.api.dependencies import PaginationDep
 from src.database import async_session_maker, engine
 from src.models.hotels import HotelsModel
+from src.repositories.hotels import HotelsRepository
 from src.schemas.hotels import Hotel, HotelPATCH
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -15,23 +16,26 @@ async def get_hotels(
         location: str | None = Query(None, description="Местоположение отеля"),
         title: str | None = Query(None, description="Название отеля"),
 ):
-    per_page = pagination.per_page or 5
     async with async_session_maker() as session:
-        query = select(HotelsModel)
-        if location:
-            query = query.filter(func.lower(HotelsModel.location).contains(location.strip().lower()))
-        if title:
-            query = query.filter(func.lower(HotelsModel.title).contains(title.strip().lower()))
-        query = (
-            query
-            .limit(per_page)
-            .offset(per_page * (pagination.page - 1))
-        )
-        print(query.compile(engine, compile_kwargs={"literal_binds": True}))
-        result = await session.execute(query)
-        hotels = result.scalars().all()
-        print(type(hotels), hotels)
-        return hotels
+        return await HotelsRepository(session).get_all()
+
+    # per_page = pagination.per_page or 5
+    # async with async_session_maker() as session:
+    #     query = select(HotelsModel)
+    #     if location:
+    #         query = query.filter(func.lower(HotelsModel.location).contains(location.strip().lower()))
+    #     if title:
+    #         query = query.filter(func.lower(HotelsModel.title).contains(title.strip().lower()))
+    #     query = (
+    #         query
+    #         .limit(per_page)
+    #         .offset(per_page * (pagination.page - 1))
+    #     )
+    #     print(query.compile(engine, compile_kwargs={"literal_binds": True}))
+    #     result = await session.execute(query)
+    #     hotels = result.scalars().all()
+    #     print(type(hotels), hotels)
+    #     return hotels
 
 
 
