@@ -26,6 +26,12 @@ async def get_hotels(
         )
 
 
+@router.get("/{hotel_id}")
+async def get_hotel_by_id(hotel_id: int):
+    async with async_session_maker() as session:
+        hotel = await HotelsRepository(session).get_one_or_none(id=hotel_id)
+        return hotel
+
 @router.post("")
 async def create_hotel(
         hotel_data: Hotel = Body(
