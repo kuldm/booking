@@ -1,9 +1,5 @@
-from fastapi import HTTPException, status
-
 from pydantic import BaseModel
 from sqlalchemy import select, insert, delete, update
-
-from src.schemas.hotels import Hotel
 
 
 class BaseRepository:
@@ -17,7 +13,7 @@ class BaseRepository:
         """Извлекает все записи, соответствующие фильтру."""
         query = select(self.model)
         result = await self.session.execute(query)
-        return [self.schema.model_validate(model, from_attributes=True) for model in  result.scalars().all()]
+        return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
 
     async def get_one_or_none(self, **filter_by):
         """Извлекает одну запись, соответствующую фильтру, или возвращает None."""
@@ -27,7 +23,6 @@ class BaseRepository:
         if model is None:
             return None
         return [self.schema.model_validate(model, from_attributes=True)]
-
 
     async def add(self, data: BaseModel):
         """Добавляет новую запись и возвращает созданную запись."""
@@ -46,11 +41,7 @@ class BaseRepository:
         model = result.scalars().one()
         return [self.schema.model_validate(model, from_attributes=True)]
 
-
     async def delete(self, **filter_by):
         """Удаляет записи, соответствующие фильтру."""
         delete_stmt = delete(self.model).filter_by(**filter_by).returning(self.model)
         await self.session.execute(delete_stmt)
-
-
-
