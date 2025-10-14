@@ -1,7 +1,8 @@
 from datetime import datetime, timezone, timedelta
 
-from pwdlib import PasswordHash
 import jwt
+from fastapi import HTTPException
+from pwdlib import PasswordHash
 
 from src.config import settings
 
@@ -16,13 +17,14 @@ class AuthService:
         encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
         return encoded_jwt
 
-    def hash_password(self, password) -> str:
+    def hash_password(self, password: str) -> str:
         return self.password_hash.hash(password)
 
     def verify_password(self, plain_password, hashed_password) -> bool:
         return self.password_hash.verify(plain_password, hashed_password)
 
-
-
-
-
+    def decode_token(self, token: str) -> dict:
+        try:
+            return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
+        except jwt.exceptions.DecodeError:
+            raise HTTPException(status_code=401, detail="Неверный токен")
