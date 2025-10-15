@@ -10,13 +10,16 @@ from fastapi.openapi.docs import get_swagger_ui_html
 # Иначе при запуске программы python src/main.py будет писать ошибку ModuleNotFoundError: No module named 'src'
 sys.path.append(str(Path(__file__).parent.parent))
 
-from src.api.hotels import router as router_hotels
 from src.api.auth import router as router_auth
+from src.api.hotels import router as router_hotels
+from src.api.rooms import router as router_rooms, router_all_rooms
 
 app = FastAPI()
 
 app.include_router(router_auth)
 app.include_router(router_hotels)
+app.include_router(router_rooms)
+app.include_router(router_all_rooms)
 
 
 @app.get("/docs", include_in_schema=False)

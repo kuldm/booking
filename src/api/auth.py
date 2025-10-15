@@ -9,7 +9,11 @@ from src.services.auth import AuthService
 router = APIRouter(prefix="/auth", tags=["Авторизация и Аутентификация"])
 
 
-@router.post("/register")
+@router.post(
+    "/register",
+    summary="Зарегистрироваться",
+    description="<h3>В этой ручке мы регистрируемся в системе<h3>"
+)
 async def register_user(
         user_data: UserRequestAdd = Body(openapi_examples={
             "1": {"summary": "Дмитрий", "value": {
@@ -31,7 +35,11 @@ async def register_user(
     return {"status": "OK"}
 
 
-@router.post("/login")
+@router.post(
+    "/login",
+    summary="Залогиниться",
+    description="<h3>В этой ручке мы входим в систему по логину и паролю<h3>"
+)
 async def register_user(
         response: Response,
         user_data: UserRequestAdd = Body(openapi_examples={
@@ -56,7 +64,11 @@ async def register_user(
         return {"access_token": access_token}
 
 
-@router.get("/me")
+@router.get(
+    "/me",
+    summary="Получить данные аутентифицированного пользователя",
+    description="<h3>В этой ручке мы получаем данные о пользователе который сейчас залогинен<h3>"
+)
 async def get_me(
         user_id: UserIdDep,
 ):
@@ -65,7 +77,11 @@ async def get_me(
         return user
 
 
-@router.post("/logout")
+@router.post(
+    "/logout",
+    summary="Разлогиниться",
+    description="<h3>В этой ручке удаляем куки access_token из браузера<h3>"
+)
 async def logout_user(
         response: Response,
 ):
