@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query, Body
 from sqlalchemy import insert, select, func
 
-from src.api.dependencies import PaginationDep
+from src.api.dependencies import PaginationDep, DBDep
 from src.database import async_session_maker, engine, session
 from src.models.hotels import HotelsModel
 from src.repositories.hotels import HotelsRepository
@@ -17,17 +17,17 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 )
 async def get_hotels(
         pagination: PaginationDep,
+        db: DBDep,
         location: str | None = Query(None, description="Местоположение отеля"),
         title: str | None = Query(None, description="Название отеля"),
 ):
     per_page = pagination.per_page or 5
-    async with async_session_maker() as session:
-        return await HotelsRepository(session).get_all(
-            location=location,
-            title=title,
-            limit=per_page,
-            offset=per_page * (pagination.page - 1)
-        )
+    return await db.hotels.get_all(
+        location=location,
+        title=title,
+        limit=per_page,
+        offset=per_page * (pagination.page - 1)
+    )
 
 
 @router.get(
@@ -35,10 +35,11 @@ async def get_hotels(
     summary="Получение отеля по ID",
     description="<h3>В этой ручке мы получаем данные об отеле по его ID<h3>"
 )
-async def get_hotel_by_id(hotel_id: int):
-    async with async_session_maker() as session:
-        hotel = await HotelsRepository(session).get_one_or_none(id=hotel_id)
-        return hotel
+async def get_hotel_by_id(
+        db: DBDep,
+        hotel_id: int,
+):
+    return await db.hotels.get_one_or_none(id=hotel_id)
 
 
 @router.post(
@@ -47,6 +48,7 @@ async def get_hotel_by_id(hotel_id: int):
     description="<h3>В этой ручке мы частичного обновляем данные об отеле<h3>"
 )
 async def create_hotel(
+        db: DBDep,
         hotel_data: HotelAdd = Body(openapi_examples={
             "1": {"summary": "Сочи", "value": {
                 "title": "Отель Сочи 5 звёзд у моря",
@@ -56,12 +58,11 @@ async def create_hotel(
                 "title": "Отель Дубай у фонтана",
                 "location": "dubi_fontain"
             }},
-            }
+        }
         ),
 ):
-    async with async_session_maker() as session:
-        hotel = await HotelsRepository(session).add(hotel_data)
-        await session.commit()
+    hotel = await db.hotels.add(hotel_data)
+    await db.commit()
     return {"Status": "OK", "data": hotel}
 
 
@@ -71,13 +72,13 @@ async def create_hotel(
     description="<h3>В этой ручке мы полностью обновляем данные об отеле<h3>"
 )
 async def update_hotel(
+        db: DBDep,
         hotel_id: int,
         hotel_data: HotelAdd,
 ):
-    async with async_session_maker() as session:
-        hotel = await HotelsRepository(session).edit(id=hotel_id, data=hotel_data)
-        await session.commit()
-        return {"Status": "OK", "data": hotel}
+    hotel = await db.hotels.edit(id=hotel_id, data=hotel_data)
+    await db.commit()
+    return {"Status": "OK", "data": hotel}
 
 
 @router.patch(
@@ -86,12 +87,12 @@ async def update_hotel(
     description="<h3>В этой ручке мы частичного обновляем данные об отеле. Можем отправить title, а можем отправить name<h3>",
 )
 async def update_patch_hotel(
+        db: DBDep,
         hotel_id: int,
         hotel_data: HotelPATCH
 ):
-    async with async_session_maker() as session:
-        hotel = await HotelsRepository(session).edit(id=hotel_id, exclude_unset=True, data=hotel_data)
-        await session.commit()
+    hotel = await db.hotels.edit(id=hotel_id, exclude_unset=True, data=hotel_data)
+    await db.commit()
     return {"Status": "OK", "data": hotel}
 
 
@@ -101,9 +102,9 @@ async def update_patch_hotel(
     description="<h3>В этой ручке мы удаляем данные об отеле<h3>",
 )
 async def delete_hotel(
+        db: DBDep,
         hotel_id: int
 ):
-    async with async_session_maker() as session:
-        await HotelsRepository(session).delete(id=hotel_id)
-        await session.commit()
-        return {"Status": "OK"}
+    await db.hotels.delete(id=hotel_id)
+    await db.commit()
+    return {"Status": "OK"}
