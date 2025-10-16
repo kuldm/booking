@@ -13,7 +13,7 @@ class Hotel(HotelAdd):
 
 
 class HotelPATCH(BaseModel):
-    title: str | None = Field(None)
-    location: str | None = Field(None)
+    title: str | None = None
+    location: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
