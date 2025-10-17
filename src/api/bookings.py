@@ -22,7 +22,7 @@ async def get_all_bookings(
     summary="Получение бронирований пользователя",
     description="<h3>В этой ручке мы получаем список всех бронирований залогиненного пользователя<h3>",
 )
-async def get_bookings(
+async def get_my_bookings(
         db: DBDep,
         user_id: UserIdDep,
 ):

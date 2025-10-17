@@ -1,12 +1,13 @@
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql import func
 
-from src.database import Base
+from src.database import Base, TimestampMixin
 
 
-class BookingsModel(Base):
+class BookingsModel(Base, TimestampMixin):
     __tablename__ = 'bookings'
 
     id: Mapped[int] = mapped_column(primary_key=True)

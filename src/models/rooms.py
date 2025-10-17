@@ -1,10 +1,10 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, ForeignKey
 
-from src.database import Base
+from src.database import Base, TimestampMixin
 
 
-class RoomsModel(Base):
+class RoomsModel(Base, TimestampMixin):
     __tablename__ = "rooms"
 
     id: Mapped[int] = mapped_column(primary_key=True)
