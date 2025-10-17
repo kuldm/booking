@@ -6,14 +6,22 @@ from src.schemas.bookings import BookingAdd, BookingAddRequest
 router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
 
-@router.get("")
+@router.get(
+    "",
+    summary="Получение всех бронирований",
+    description="<h3>В этой ручке мы получаем список всех бронирований<h3>",
+)
 async def get_all_bookings(
         db: DBDep,
 ):
     return await db.bookings.get_all()
 
 
-@router.get("/me")
+@router.get(
+    "/me",
+    summary="Получение бронирований пользователя",
+    description="<h3>В этой ручке мы получаем список всех бронирований залогиненного пользователя<h3>",
+)
 async def get_bookings(
         db: DBDep,
         user_id: UserIdDep,
