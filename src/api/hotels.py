@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Query, Body
 from sqlalchemy import insert, select, func
 
@@ -20,13 +22,19 @@ async def get_hotels(
         db: DBDep,
         location: str | None = Query(None, description="Местоположение отеля"),
         title: str | None = Query(None, description="Название отеля"),
+        date_from: date = Query(example="2025-10-01"),
+        date_to: date = Query(example="2025-10-10"),
 ):
     per_page = pagination.per_page or 5
-    return await db.hotels.get_all(
-        location=location,
-        title=title,
-        limit=per_page,
-        offset=per_page * (pagination.page - 1)
+    # return await db.hotels.get_all(
+    #     location=location,
+    #     title=title,
+    #     limit=per_page,
+    #     offset=per_page * (pagination.page - 1)
+    # )
+    return await db.hotels.get_filtered_by_time(
+        date_from=date_from,
+        date_to=date_to
     )
 
 
