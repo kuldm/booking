@@ -50,6 +50,9 @@ class RoomsRepository(BaseRepository):
     async def get_filtered_by_time(
             self,
             hotel_id,
+            title,
+            limit,
+            offset,
             date_from,
             date_to,
     ):
@@ -67,6 +70,6 @@ class RoomsRepository(BaseRepository):
         select * from rooms_left_table
         where rooms_left > 0 and room_id in (select id from rooms where hotel_id = 26);
         """
-        rooms_ids_to_get = rooms_ids_for_booking(date_from, date_to, hotel_id)
+        rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to, hotel_id=hotel_id, title=title, limit=limit, offset=offset)
 
         return await self.get_filtered(RoomsModel.id.in_(rooms_ids_to_get))

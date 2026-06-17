@@ -38,8 +38,12 @@ class HotelsRepository(BaseRepository):
             self,
             date_from: date,
             date_to: date,
+            location: str,
+            title: str,
+            limit: int,
+            offset: int,
     ):
-        rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to)
+        rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to, limit=limit, offset=offset, title=title, location=location)
         hotels_ids_to_get = (
             select(RoomsModel.hotel_id)
             .select_from(RoomsModel)

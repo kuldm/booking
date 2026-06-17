@@ -112,7 +112,7 @@ async def create_room(
         ),
 ):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
-    room = db.rooms.add(_room_data)
+    room = await db.rooms.add(_room_data)
     await db.commit()
     return {"Status": "OK", "data": room}
 
@@ -146,7 +146,7 @@ async def update_patch_room(
         room_data: RoomPatchRequest,
 ):
     _room_data = RoomPatch(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
-    room = db.rooms.edit(id=room_id, hotel_id=hotel_id, exclude_unset=True, data=_room_data)
+    room = await db.rooms.edit(id=room_id, hotel_id=hotel_id, exclude_unset=True, data=_room_data)
     await db.commit()
     return {"Status": "OK", "data": room}
 

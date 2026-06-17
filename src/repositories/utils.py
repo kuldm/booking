@@ -2,6 +2,7 @@ from sqlalchemy import select, func
 from datetime import date
 
 from src.models.bookings import BookingsModel
+from src.models.hotels import HotelsModel
 from src.models.rooms import RoomsModel
 
 
@@ -9,6 +10,10 @@ def rooms_ids_for_booking(
         date_from: date,
         date_to: date,
         hotel_id: int | None = None,
+        title: str | None = None,
+        location: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
 ):
     """
     with rooms_count as (
@@ -64,6 +69,10 @@ def rooms_ids_for_booking(
             rooms_left_table.c.room_id.in_(rooms_ids_for_hotel),
         )
     )
+    if location:
+        rooms_id_to_get = rooms_id_to_get.filter(func.lower(HotelsModel.location).contains(location.strip().lower()))
+    if title:
+        rooms_id_to_get = rooms_id_to_get.filter(func.lower(HotelsModel.title).contains(title.strip().lower()))
     # print(rooms_id_to_get.compile(bind=engine, compile_kwargs={"literal_binds": True}))
     return rooms_id_to_get
 

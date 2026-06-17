@@ -20,3 +20,7 @@ class BookingsModel(Base, TimestampMixin):
     @hybrid_property
     def total_cost(self) -> int:
         return self.price * (self.date_to - self.date_from).days
+
+    @total_cost.expression
+    def total_cost(cls) -> int:
+        return cls.price * func.date_part("day", cls.date_to - cls.date_from)
