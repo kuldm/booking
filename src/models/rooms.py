@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, ForeignKey
 
 from src.database import Base, TimestampMixin
@@ -13,3 +13,8 @@ class RoomsModel(Base, TimestampMixin):
     description: Mapped[str | None]
     price: Mapped[int]
     quantity: Mapped[int]
+
+    facilities: Mapped[list["FacilitiesModels"]] = relationship(
+        back_populates="rooms",
+        secondary="rooms_facilities",
+    )

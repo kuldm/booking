@@ -1,11 +1,12 @@
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload, joinedload
 
 from src.database import engine
 from src.models.bookings import BookingsModel
 from src.models.rooms import RoomsModel
 from src.repositories.base import BaseRepository
 from src.repositories.utils import rooms_ids_for_booking
-from src.schemas.rooms import Room
+from src.schemas.rooms import Room, RoomWithRels
 
 
 class RoomsRepository(BaseRepository):
@@ -70,6 +71,14 @@ class RoomsRepository(BaseRepository):
         select * from rooms_left_table
         where rooms_left > 0 and room_id in (select id from rooms where hotel_id = 26);
         """
-        rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to, hotel_id=hotel_id, title=title, limit=limit, offset=offset)
+        rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to, hotel_id=hotel_id, title=title,
+                                                 limit=limit, offset=offset)
 
-        return await self.get_filtered(RoomsModel.id.in_(rooms_ids_to_get))
+        query = (
+            select(self.model)
+            .options(selectinload(self.model.facilities))
+            .filter(RoomsModel.id.in_(rooms_ids_to_get))
+        )
+        result = await self.session.execute(query)
+        return [RoomWithRels.model_validate(model) for model in result.scalars().all()]
+
