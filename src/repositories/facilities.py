@@ -1,13 +1,14 @@
 from sqlalchemy import select, func, insert, delete
 
-from src.models.facilities import FacilitiesModels, RoomsFacilitiesModels
+from src.models.facilities import FacilitiesModel, RoomsFacilitiesModel
 from src.repositories.base import BaseRepository
+from src.repositories.mappers.mappers import FacilityDataMapper, RoomFacilityDataMapper
 from src.schemas.facilities import Facility, RoomFacility, RoomFacilityAdd
 
 
 class FacilitiesRepository(BaseRepository):
-    model = FacilitiesModels
-    schema = Facility
+    model = FacilitiesModel
+    mapper = FacilityDataMapper
 
     async def get_all_facilities(
             self,
@@ -16,21 +17,21 @@ class FacilitiesRepository(BaseRepository):
             offset
     ) -> list[Facility]:
         """Извлекает все удобства согласно фильтру."""
-        query = select(FacilitiesModels)
+        query = select(FacilitiesModel)
         if title:
-            query = query.filter(func.lower(FacilitiesModels.title).contains(title.strip().lower()))
+            query = query.filter(func.lower(FacilitiesModel.title).contains(title.strip().lower()))
         query = (
             query
             .limit(limit)
             .offset(offset)
         )
         result = await self.session.execute(query)
-        return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+        return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
 
 class RoomsFacilitiesRepository(BaseRepository):
-    model = RoomsFacilitiesModels
-    schema = RoomFacility
+    model = RoomsFacilitiesModel
+    mapper = RoomFacilityDataMapper
 
     async def set_room_facilities(
             self,
@@ -70,7 +71,7 @@ class RoomsFacilitiesRepository(BaseRepository):
             room_id,
     ) -> list[RoomFacilityAdd]:
         """Извлекает все удобства комнаты по её id."""
-        query = select(RoomsFacilitiesModels).where(self.model.room_id == room_id)
+        query = select(RoomsFacilitiesModel).where(self.model.room_id == room_id)
         result = await self.session.execute(query)
-        result2 = [RoomFacilityAdd.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+        result2 = [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
         return result2

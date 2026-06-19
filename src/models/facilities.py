@@ -4,7 +4,7 @@ from sqlalchemy import String, ForeignKey
 from src.database import Base
 
 
-class FacilitiesModels(Base):
+class FacilitiesModel(Base):
     __tablename__ = "facilities"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -16,7 +16,7 @@ class FacilitiesModels(Base):
     )
 
 
-class RoomsFacilitiesModels(Base):
+class RoomsFacilitiesModel(Base):
     __tablename__ = "rooms_facilities"
 
     id: Mapped[int] = mapped_column(primary_key=True)
