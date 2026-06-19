@@ -36,7 +36,12 @@ class BaseRepository:
         add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
         result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
-        return [self.schema.model_validate(model, from_attributes=True)]
+        return self.schema.model_validate(model, from_attributes=True)
+
+    async def add_bulk(self, data: list[BaseModel]):
+        """Добавляет новую запись и возвращает созданную запись."""
+        add_data_stmt = insert(self.model).values([item.model_dump() for item in data])
+        await self.session.execute(add_data_stmt)
 
     async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by):
         update_stmt = (
@@ -46,7 +51,7 @@ class BaseRepository:
         )
         result = await self.session.execute(update_stmt)
         model = result.scalars().one()
-        return [self.schema.model_validate(model, from_attributes=True)]
+        return self.schema.model_validate(model, from_attributes=True)
 
     async def delete(self, **filter_by):
         """Удаляет записи, соответствующие фильтру."""

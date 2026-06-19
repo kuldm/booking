@@ -5,6 +5,7 @@ from fastapi import APIRouter, Query, Body
 from src.api.dependencies import PaginationDep, DBDep
 from src.database import async_session_maker
 from src.repositories.rooms import RoomsRepository
+from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
@@ -83,44 +84,53 @@ async def create_room(
                 "description": "Простая комната",
                 "price": 15,
                 "quantity": 15,
+                "facilities_ids": [],
             }},
             "2": {"summary": "Сочи хорошая комната", "value": {
                 "title": "Хорошая комната в отеле Сочи",
                 "description": "Хорошая комната",
                 "price": 50,
                 "quantity": 5,
+                "facilities_ids": [],
             }},
             "3": {"summary": "Сочи отличная комната", "value": {
                 "title": "Отличная комната в отеле Сочи",
                 "description": "Отличная комната",
                 "price": 75,
                 "quantity": 7,
+                "facilities_ids": [],
             }},
             "4": {"summary": "Дубай комната", "value": {
                 "title": "Роскошная комната в отеле Дубай",
                 "description": "Роскошная комната",
                 "price": 100,
                 "quantity": 10,
+                "facilities_ids": [],
             }},
             "5": {"summary": "Дубай королевская комната", "value": {
                 "title": "Королевская комната в отеле Дубай",
                 "description": "Королевская комната",
                 "price": 1000,
                 "quantity": 1,
+                "facilities_ids": [],
             }},
         }
         ),
 ):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.add(_room_data)
+
+    rooms_facilities_data = [RoomFacilityAdd(room_id=room.id, facility_id=f_id) for f_id in room_data.facilities_ids]
+    await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
+
     return {"Status": "OK", "data": room}
 
 
 @router.put(
     "/{hotel_id}/rooms/{room_id}",
-    summary="Полное обновление данных отеля",
-    description="<h3>В этой ручке мы полностью обновляем данные отеля<h3>",
+    summary="Полное обновление данных комнаты конкретного отеля",
+    description="<h3>В этой ручке мы полностью обновляем данные комнаты конкретного отеля<h3>",
 )
 async def update_room(
         db: DBDep,
@@ -130,14 +140,16 @@ async def update_room(
 ):
     _room_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
     room = await db.rooms.edit(id=room_id, hotel_id=hotel_id, data=_room_data)
+    await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data.facilities_ids)
     await db.commit()
+
     return {"Status": "OK", "data": room}
 
 
 @router.patch(
     "/{hotel_id}/rooms/{room_id}",
-    summary="Частичное обновление данных отеля",
-    description="<h3>В этой ручке мы можем частично обновить данные отеля<h3>",
+    summary="Частичное обновление данных комнаты конкретного отеля",
+    description="<h3>В этой ручке мы можем частично обновить данные конкретного отеля<h3>",
 )
 async def update_patch_room(
         db: DBDep,
@@ -145,9 +157,13 @@ async def update_patch_room(
         room_id: int,
         room_data: RoomPatchRequest,
 ):
-    _room_data = RoomPatch(hotel_id=hotel_id, **room_data.model_dump(exclude_unset=True))
-    room = await db.rooms.edit(id=room_id, hotel_id=hotel_id, exclude_unset=True, data=_room_data)
+    _room_data_dict = room_data.model_dump(exclude_unset=True)
+    _room_data = RoomPatch(hotel_id=hotel_id, **_room_data_dict)
+    room = await db.rooms.edit(_room_data, exclude_unset=True, id=room_id, hotel_id=hotel_id)
+    if "facilities_ids" in _room_data_dict:
+        await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=_room_data_dict["facilities_ids"])
     await db.commit()
+
     return {"Status": "OK", "data": room}
 
 

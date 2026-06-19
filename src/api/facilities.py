@@ -36,6 +36,18 @@ async def get_facility_by_id(
     return await db.facilities.get_one_or_none(id=facility_id)
 
 
+@router.get(
+    "/rooms/{room_id}",
+    summary="Получение удобств комнаты по ID комнаты",
+    description="<h3>В этой ручке мы получаем данные о всех удобствах комнаты по eё ID<h3>"
+)
+async def get_rooms_facilities(
+        db: DBDep,
+        room_id: int,
+):
+    return await db.rooms_facilities.get_room_facilities(room_id=room_id)
+
+
 @router.post(
     "",
     summary="Создание удобства",
@@ -49,6 +61,9 @@ async def create_facility(
             }},
             "2": {"summary": "Тропический душ", "value": {
                 "title": "Тропический душ"
+            }},
+            "3": {"summary": "Wi-Fi", "value": {
+                "title": "Wi-Fi"
             }},
         }
         ),

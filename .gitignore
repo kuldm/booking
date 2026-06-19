@@ -3,3 +3,6 @@
 __pycache__/
 .env
 run_dev.py
+
+Dockerfile
+docker-compose.yml
