@@ -12,19 +12,16 @@ class FacilitiesRepository(BaseRepository):
 
     async def get_all_facilities(
             self,
-            title,
-            limit,
-            offset
     ) -> list[Facility]:
         """Извлекает все удобства согласно фильтру."""
-        query = select(FacilitiesModel)
-        if title:
-            query = query.filter(func.lower(FacilitiesModel.title).contains(title.strip().lower()))
-        query = (
-            query
-            .limit(limit)
-            .offset(offset)
-        )
+        query = select(self.model)
+        # if title:
+        #     query = query.filter(func.lower(self.model.title).contains(title.strip().lower()))
+        # query = (
+        #     query
+        #     .limit(limit)
+        #     .offset(offset)
+        # )
         result = await self.session.execute(query)
         return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
 

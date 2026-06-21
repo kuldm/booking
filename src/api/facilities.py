@@ -1,6 +1,9 @@
+import json
+
 from fastapi import APIRouter, Query, Body
 
 from src.api.dependencies import PaginationDep, DBDep
+from src.init import redis_manager
 from src.schemas.facilities import FacilityAdd, FacilityPATCH
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])
@@ -13,15 +16,20 @@ router = APIRouter(prefix="/facilities", tags=["Удобства"])
 )
 async def get_all_facilities(
         db: DBDep,
-        pagination: PaginationDep,
-        title: str | None = Query(None, description="Название удобства"),
 ):
-    per_page = pagination.per_page or 5
-    return await db.facilities.get_all_facilities(
-        title=title,
-        limit=per_page,
-        offset=per_page * (pagination.page - 1)
-    )
+    facilities_from_cache = await redis_manager.get("facilities")
+    print(f"{facilities_from_cache=}")
+    if not facilities_from_cache:
+        facilities =  await db.facilities.get_all_facilities()
+        facilities_schemas: list[dict] = [f.model_dump() for f in facilities]
+        facilities_json = json.dumps(facilities_schemas)
+        await redis_manager.set("facilities", facilities_json, 10)
+
+        return facilities
+    else:
+        facilities_dicts = json.loads(facilities_from_cache)
+        return facilities_dicts
+
 
 
 @router.get(
