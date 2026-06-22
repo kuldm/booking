@@ -6,6 +6,7 @@ from fastapi_cache.decorator import cache
 from src.api.dependencies import PaginationDep, DBDep
 from src.init import redis_manager
 from src.schemas.facilities import FacilityAdd, FacilityPATCH
+from src.tasks.tasks import test_task
 
 router = APIRouter(prefix="/facilities", tags=["Удобства"])
 
@@ -68,6 +69,9 @@ async def create_facility(
 ):
     facility = await db.facilities.add(facility_data)
     await db.commit()
+
+    test_task.delay()
+
     return {"Status": "OK", "data": facility}
 
 
