@@ -6,6 +6,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
 # Эта конструкция нужна чтобы определить путь текущего файла, определить его родителя (папка src) и определить родителя (папки src)
 # И добавить её в пути с которыми может работать интерпритатор. После этого интерпритатор будет понимать что такое src.
 # Иначе при запуске программы python src/main.py будет писать ошибку ModuleNotFoundError: No module named 'src'
@@ -24,6 +27,8 @@ from src.init import redis_manager
 async def lifespan(app: FastAPI):
     # При старте приложения
     await redis_manager.connect()
+
+    FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
     yield
     # При перезагрузке приложения
     await redis_manager.close()

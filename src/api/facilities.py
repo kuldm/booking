@@ -1,6 +1,7 @@
 import json
 
 from fastapi import APIRouter, Query, Body
+from fastapi_cache.decorator import cache
 
 from src.api.dependencies import PaginationDep, DBDep
 from src.init import redis_manager
@@ -14,22 +15,11 @@ router = APIRouter(prefix="/facilities", tags=["Удобства"])
     summary="Получение всех удобств",
     description="<h3>В этой ручке мы получаем список всех удобств. Можем фильтроваться по title<h3>",
 )
+@cache(expire=10)
 async def get_all_facilities(
         db: DBDep,
 ):
-    facilities_from_cache = await redis_manager.get("facilities")
-    print(f"{facilities_from_cache=}")
-    if not facilities_from_cache:
-        facilities =  await db.facilities.get_all_facilities()
-        facilities_schemas: list[dict] = [f.model_dump() for f in facilities]
-        facilities_json = json.dumps(facilities_schemas)
-        await redis_manager.set("facilities", facilities_json, 10)
-
-        return facilities
-    else:
-        facilities_dicts = json.loads(facilities_from_cache)
-        return facilities_dicts
-
+    return await db.facilities.get_all_facilities()
 
 
 @router.get(
