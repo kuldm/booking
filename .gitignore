@@ -8,3 +8,9 @@ _course_helpers
 
 Dockerfile
 docker-compose.yml
+
+celerybeat-schedule.bak
+celerybeat-schedule.dat
+celerybeat-schedule.dir
+
+src/static/images/
