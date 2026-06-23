@@ -2,6 +2,7 @@
 .idea
 __pycache__/
 .env
+.env-test
 run_dev.py
 
 _course_helpers
