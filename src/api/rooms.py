@@ -40,8 +40,8 @@ async def get_all_hotel_rooms(
         pagination: PaginationDep,
         hotel_id: int,
         title: str | None = Query(None, description="Местоположение номера"),
-        date_from: date = Query(example="2025-10-01"),
-        date_to: date = Query(example="2025-10-10"),
+        date_from: date = Query(examples="2025-10-01"),
+        date_to: date = Query(examples="2025-10-10"),
 ):
     per_page = pagination.per_page or 5
     return await db.rooms.get_filtered_by_time(
