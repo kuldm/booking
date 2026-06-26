@@ -41,7 +41,7 @@ class BaseRepository:
         return self.mapper.map_to_domain_entity(model)
 
     async def add_bulk(self, data: list[BaseModel]):
-        """Добавляет новую запись и возвращает созданную запись."""
+        """Добавляет новую запись"""
         add_data_stmt = insert(self.model).values([item.model_dump() for item in data])
         await self.session.execute(add_data_stmt)
 
