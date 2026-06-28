@@ -1,4 +1,14 @@
 import json
+from unittest import mock
+
+# # выражение lambda *args, **kwargs: lambda f: f по сути это вот что
+# def empty_cache(*args, **kwargs):
+#     def wrapper(func):
+#         return func
+#     return wrapper
+
+# Важно мокать функцию до того как она импортируется в прокет. Поэтому мок идёт перед всеми остальными функциямм в conftest
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 import pytest
 from httpx import ASGITransport, AsyncClient

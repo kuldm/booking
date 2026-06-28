@@ -16,7 +16,7 @@ router = APIRouter(prefix="/facilities", tags=["Удобства"])
     summary="Получение всех удобств",
     description="<h3>В этой ручке мы получаем список всех удобств. Можем фильтроваться по title<h3>",
 )
-# @cache(expire=10)
+@cache(expire=10)
 async def get_all_facilities(
         db: DBDep,
 ):
