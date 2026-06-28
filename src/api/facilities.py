@@ -72,7 +72,7 @@ async def create_facility(
 
     test_task.delay()
 
-    return {"Status": "OK", "data": facility}
+    return {"status": "OK", "data": facility}
 
 
 @router.put(
@@ -87,7 +87,7 @@ async def update_facility(
 ):
     facility = await db.facilities.edit(id=facility_id, data=facility_data)
     await db.commit()
-    return {"Status": "OK", "data": facility}
+    return {"status": "OK", "data": facility}
 
 
 @router.patch(
@@ -102,7 +102,7 @@ async def update_patch_facility(
 ):
     facility = await db.facilities.edit(id=facility_id, exclude_unset=True, data=facility_data)
     await db.commit()
-    return {"Status": "OK", "data": facility}
+    return {"status": "OK", "data": facility}
 
 
 @router.delete(
@@ -116,4 +116,4 @@ async def delete_facility_by_id(
 ):
     await db.facilities.delete(id=facility_id)
     await db.commit()
-    return {"Status": "OK"}
+    return {"status": "OK"}

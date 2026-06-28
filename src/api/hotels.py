@@ -77,7 +77,7 @@ async def create_hotel(
 ):
     hotel = await db.hotels.add(hotel_data)
     await db.commit()
-    return {"Status": "OK", "data": hotel}
+    return {"status": "OK", "data": hotel}
 
 
 @router.put(
@@ -92,7 +92,7 @@ async def update_hotel(
 ):
     hotel = await db.hotels.edit(id=hotel_id, data=hotel_data)
     await db.commit()
-    return {"Status": "OK", "data": hotel}
+    return {"status": "OK", "data": hotel}
 
 
 @router.patch(
@@ -107,7 +107,7 @@ async def update_patch_hotel(
 ):
     hotel = await db.hotels.edit(id=hotel_id, exclude_unset=True, data=hotel_data)
     await db.commit()
-    return {"Status": "OK", "data": hotel}
+    return {"status": "OK", "data": hotel}
 
 
 @router.delete(
@@ -121,4 +121,4 @@ async def delete_hotel(
 ):
     await db.hotels.delete(id=hotel_id)
     await db.commit()
-    return {"Status": "OK"}
+    return {"status": "OK"}

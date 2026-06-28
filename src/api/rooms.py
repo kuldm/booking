@@ -124,7 +124,7 @@ async def create_room(
     await db.rooms_facilities.add_bulk(rooms_facilities_data)
     await db.commit()
 
-    return {"Status": "OK", "data": room}
+    return {"status": "OK", "data": room}
 
 
 @router.put(
@@ -143,7 +143,7 @@ async def update_room(
     await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=room_data.facilities_ids)
     await db.commit()
 
-    return {"Status": "OK", "data": room}
+    return {"status": "OK", "data": room}
 
 
 @router.patch(
@@ -164,7 +164,7 @@ async def update_patch_room(
         await db.rooms_facilities.set_room_facilities(room_id, facilities_ids=_room_data_dict["facilities_ids"])
     await db.commit()
 
-    return {"Status": "OK", "data": room}
+    return {"status": "OK", "data": room}
 
 
 @router.delete(
@@ -179,4 +179,4 @@ async def delete_room(
 ):
     await db.rooms.delete(id=room_id, hotel_id=hotel_id)
     await db.commit()
-    return {"Status": "OK"}
+    return {"status": "OK"}
