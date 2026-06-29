@@ -26,14 +26,15 @@ class Base(DeclarativeBase):
 # Миксин для добавления временных меток
 class TimestampMixin:
     """Добавляет поля created_at и updated_at ко всем моделям"""
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
-        comment="Дата создания записи"
+        comment="Дата создания записи",
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         onupdate=func.now(),
-        comment="Дата последнего обновления"
+        comment="Дата последнего обновления",
     )

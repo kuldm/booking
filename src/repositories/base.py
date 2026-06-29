@@ -13,10 +13,7 @@ class BaseRepository:
 
     async def get_filtered(self, *filter, **filter_by):
         """Извлекает все записи, соответствующие фильтру."""
-        query = (
-            select(self.model)
-            .filter(*filter)
-            .filter_by(**filter_by))
+        query = select(self.model).filter(*filter).filter_by(**filter_by)
         result = await self.session.execute(query)
         return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
@@ -49,7 +46,8 @@ class BaseRepository:
         update_stmt = (
             update(self.model)
             .filter_by(**filter_by)
-            .values(**data.model_dump(exclude_unset=exclude_unset)).returning(self.model)
+            .values(**data.model_dump(exclude_unset=exclude_unset))
+            .returning(self.model)
         )
         result = await self.session.execute(update_stmt)
         model = result.scalars().one()

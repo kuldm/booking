@@ -29,7 +29,6 @@ class RoomWithRels(Room):
     facilities: list[Facility]
 
 
-
 class RoomPatchRequest(BaseModel):
     title: str | None = None
     description: str | None = None

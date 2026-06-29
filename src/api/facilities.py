@@ -15,7 +15,7 @@ router = APIRouter(prefix="/facilities", tags=["Удобства"])
 )
 @cache(expire=10)
 async def get_all_facilities(
-        db: DBDep,
+    db: DBDep,
 ):
     return await db.facilities.get_all_facilities()
 
@@ -23,11 +23,11 @@ async def get_all_facilities(
 @router.get(
     "/{facility_id}",
     summary="Получение удобства по ID",
-    description="<h3>В этой ручке мы получаем данные об удобстве по его ID<h3>"
+    description="<h3>В этой ручке мы получаем данные об удобстве по его ID<h3>",
 )
 async def get_facility_by_id(
-        db: DBDep,
-        facility_id: int,
+    db: DBDep,
+    facility_id: int,
 ):
     return await db.facilities.get_one_or_none(id=facility_id)
 
@@ -35,11 +35,11 @@ async def get_facility_by_id(
 @router.get(
     "/rooms/{room_id}",
     summary="Получение удобств комнаты по ID комнаты",
-    description="<h3>В этой ручке мы получаем данные о всех удобствах комнаты по eё ID<h3>"
+    description="<h3>В этой ручке мы получаем данные о всех удобствах комнаты по eё ID<h3>",
 )
 async def get_rooms_facilities(
-        db: DBDep,
-        room_id: int,
+    db: DBDep,
+    room_id: int,
 ):
     return await db.rooms_facilities.get_room_facilities(room_id=room_id)
 
@@ -47,22 +47,17 @@ async def get_rooms_facilities(
 @router.post(
     "",
     summary="Создание удобства",
-    description="<h3>В этой ручке мы частичного обновляем данные об отеле<h3>"
+    description="<h3>В этой ручке мы частичного обновляем данные об отеле<h3>",
 )
 async def create_facility(
-        db: DBDep,
-        facility_data: FacilityAdd = Body(openapi_examples={
-            "1": {"summary": "Кондеционер", "value": {
-                "title": "Кондеционер"
-            }},
-            "2": {"summary": "Тропический душ", "value": {
-                "title": "Тропический душ"
-            }},
-            "3": {"summary": "Wi-Fi", "value": {
-                "title": "Wi-Fi"
-            }},
+    db: DBDep,
+    facility_data: FacilityAdd = Body(
+        openapi_examples={
+            "1": {"summary": "Кондеционер", "value": {"title": "Кондеционер"}},
+            "2": {"summary": "Тропический душ", "value": {"title": "Тропический душ"}},
+            "3": {"summary": "Wi-Fi", "value": {"title": "Wi-Fi"}},
         }
-        ),
+    ),
 ):
     facility = await db.facilities.add(facility_data)
     await db.commit()
@@ -75,12 +70,12 @@ async def create_facility(
 @router.put(
     "/{facility_id}",
     summary="Полное обновление данных удобства",
-    description="<h3>В этой ручке мы полностью обновляем данные об удобстве<h3>"
+    description="<h3>В этой ручке мы полностью обновляем данные об удобстве<h3>",
 )
 async def update_facility(
-        db: DBDep,
-        facility_id: int,
-        facility_data: FacilityAdd,
+    db: DBDep,
+    facility_id: int,
+    facility_data: FacilityAdd,
 ):
     facility = await db.facilities.edit(id=facility_id, data=facility_data)
     await db.commit()
@@ -90,12 +85,12 @@ async def update_facility(
 @router.patch(
     "/{facility_id}",
     summary="Частичное обновление данных удобства",
-    description="<h3>В этой ручке мы частичного обновляем данные об удобстве<h3>"
+    description="<h3>В этой ручке мы частичного обновляем данные об удобстве<h3>",
 )
 async def update_patch_facility(
-        db: DBDep,
-        facility_id: int,
-        facility_data: FacilityPATCH,
+    db: DBDep,
+    facility_id: int,
+    facility_data: FacilityPATCH,
 ):
     facility = await db.facilities.edit(id=facility_id, exclude_unset=True, data=facility_data)
     await db.commit()
@@ -108,8 +103,8 @@ async def update_patch_facility(
     description="<h3>В этой ручке мы удаляем удобство об отеле<h3>",
 )
 async def delete_facility_by_id(
-        db: DBDep,
-        facility_id: int,
+    db: DBDep,
+    facility_id: int,
 ):
     await db.facilities.delete(id=facility_id)
     await db.commit()

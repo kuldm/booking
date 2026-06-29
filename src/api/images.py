@@ -9,7 +9,7 @@ router = APIRouter(prefix="/images", tags=["Изображения отелей"
 @router.post(
     "",
     summary="Загрузка изображения",
-    description="<h3>В этой ручке мы загружаем изображение<h3>"
+    description="<h3>В этой ручке мы загружаем изображение<h3>",
 )
 def upload_image(file: UploadFile):
     image_path = f"src/static/images/{file.filename}"

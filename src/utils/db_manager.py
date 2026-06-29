@@ -9,6 +9,7 @@ class DBManager:
     """
     Асинхронный контекстный менеджер для работы с базой данных
     """
+
     def __init__(self, session_factory):
         self.session_factory = session_factory
 

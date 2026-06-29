@@ -27,7 +27,9 @@ def resize_image(image_path: str):
 
     for size in sizes:
         # Сжимаем изображение
-        img_resized = img.resize((size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS)
+        img_resized = img.resize(
+            (size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS
+        )
 
         new_file_name = f"{name}_{size}px{ext}"
 
@@ -47,4 +49,3 @@ async def get_bookings_with_today_checkin_helper():
 @celery_instance.task(name="booking_today_checkin")
 def send_emails_to_users_with_today_checkin():
     asyncio.run(get_bookings_with_today_checkin_helper())
-

@@ -12,7 +12,7 @@ router = APIRouter(prefix="/bookings", tags=["Бронирования"])
     description="<h3>В этой ручке мы получаем список всех бронирований<h3>",
 )
 async def get_all_bookings(
-        db: DBDep,
+    db: DBDep,
 ):
     return await db.bookings.get_all()
 
@@ -23,8 +23,8 @@ async def get_all_bookings(
     description="<h3>В этой ручке мы получаем список всех бронирований залогиненного пользователя<h3>",
 )
 async def get_my_bookings(
-        db: DBDep,
-        user_id: UserIdDep,
+    db: DBDep,
+    user_id: UserIdDep,
 ):
     return await db.bookings.get_filtered(user_id=user_id)
 
@@ -34,11 +34,7 @@ async def get_my_bookings(
     summary="Создание бронирования",
     description="<h3>В этой ручке мы создаём бронирование<h3>",
 )
-async def create_booking(
-        db: DBDep,
-        user_id: UserIdDep,
-        booking_data: BookingAddRequest
-):
+async def create_booking(db: DBDep, user_id: UserIdDep, booking_data: BookingAddRequest):
     room = await db.rooms.get_one_or_none(id=booking_data.room_id)
     _booking_data = BookingAdd(user_id=user_id, price=room.price, **booking_data.model_dump())
     booking = await db.bookings.add_booking(_booking_data, hotel_id=room.hotel_id)

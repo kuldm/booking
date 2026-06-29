@@ -10,27 +10,35 @@ router = APIRouter(prefix="/auth", tags=["Авторизация и Аутент
 @router.post(
     "/register",
     summary="Зарегистрироваться",
-    description="<h3>В этой ручке мы регистрируемся в системе<h3>"
+    description="<h3>В этой ручке мы регистрируемся в системе<h3>",
 )
 async def register_user(
-        db: DBDep,
-        user_data: UserRequestAdd = Body(openapi_examples={
-            "1": {"summary": "Дмитрий", "value": {
-                "email": "dmitriy@yandex.ru",
-                "password": "111",
-            }},
-            "2": {"summary": "Максим", "value": {
-                "email": "maksim@google.com",
-                "password": "111",
-            }},
-        }),
+    db: DBDep,
+    user_data: UserRequestAdd = Body(
+        openapi_examples={
+            "1": {
+                "summary": "Дмитрий",
+                "value": {
+                    "email": "dmitriy@yandex.ru",
+                    "password": "111",
+                },
+            },
+            "2": {
+                "summary": "Максим",
+                "value": {
+                    "email": "maksim@google.com",
+                    "password": "111",
+                },
+            },
+        }
+    ),
 ):
     try:
         hashed_password = AuthService().hash_password(user_data.password)
         new_user_data = UserAdd(email=user_data.email, hashed_password=hashed_password)
         await db.users.add(new_user_data)
         await db.commit()
-    except: # noqa: E722
+    except:  # noqa: E722
         raise HTTPException(status_code=400)
 
     return {"status": "OK"}
@@ -39,21 +47,29 @@ async def register_user(
 @router.post(
     "/login",
     summary="Залогиниться",
-    description="<h3>В этой ручке мы входим в систему по логину и паролю<h3>"
+    description="<h3>В этой ручке мы входим в систему по логину и паролю<h3>",
 )
 async def login_user(
-        db: DBDep,
-        response: Response,
-        user_data: UserRequestAdd = Body(openapi_examples={
-            "1": {"summary": "Дмитрий", "value": {
-                "email": "dmitriy@yandex.ru",
-                "password": "111",
-            }},
-            "2": {"summary": "Максим", "value": {
-                "email": "maksim@google.com",
-                "password": "111",
-            }},
-        }),
+    db: DBDep,
+    response: Response,
+    user_data: UserRequestAdd = Body(
+        openapi_examples={
+            "1": {
+                "summary": "Дмитрий",
+                "value": {
+                    "email": "dmitriy@yandex.ru",
+                    "password": "111",
+                },
+            },
+            "2": {
+                "summary": "Максим",
+                "value": {
+                    "email": "maksim@google.com",
+                    "password": "111",
+                },
+            },
+        }
+    ),
 ):
     user = await db.users.get_user_with_hashed_password(email=user_data.email)
     if not user:
@@ -68,11 +84,11 @@ async def login_user(
 @router.get(
     "/me",
     summary="Получить данные аутентифицированного пользователя",
-    description="<h3>В этой ручке мы получаем данные о пользователе который сейчас залогинен<h3>"
+    description="<h3>В этой ручке мы получаем данные о пользователе который сейчас залогинен<h3>",
 )
 async def get_me(
-        db: DBDep,
-        user_id: UserIdDep,
+    db: DBDep,
+    user_id: UserIdDep,
 ):
     return await db.users.get_one_or_none(id=user_id)
 
@@ -80,10 +96,10 @@ async def get_me(
 @router.post(
     "/logout",
     summary="Разлогиниться",
-    description="<h3>В этой ручке удаляем куки access_token из браузера<h3>"
+    description="<h3>В этой ручке удаляем куки access_token из браузера<h3>",
 )
 async def logout_user(
-        response: Response,
+    response: Response,
 ):
     response.delete_cookie("access_token")
     return {"status": "OK"}

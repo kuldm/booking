@@ -14,42 +14,44 @@ class HotelsRepository(BaseRepository):
     model = HotelsModel
     mapper = HotelDataMapper
 
-
     async def get_all(
-            self,
-            location,
-            title,
-            limit,
-            offset,
+        self,
+        location,
+        title,
+        limit,
+        offset,
     ) -> list[Hotel]:
         query = select(HotelsModel)
         if location:
-            query = query.filter(func.lower(HotelsModel.location).contains(location.strip().lower()))
+            query = query.filter(
+                func.lower(HotelsModel.location).contains(location.strip().lower())
+            )
         if title:
             query = query.filter(func.lower(HotelsModel.title).contains(title.strip().lower()))
-        query = (
-            query
-            .limit(limit)
-            .offset(offset)
-        )
+        query = query.limit(limit).offset(offset)
         result = await self.session.execute(query)
-        return [self.mapper.map_to_domain_entity(model) for model in  result.scalars().all()]
+        return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
     async def get_filtered_by_time(
-            self,
-            date_from: date,
-            date_to: date,
-            location: str,
-            title: str,
-            limit: int,
-            offset: int,
+        self,
+        date_from: date,
+        date_to: date,
+        location: str,
+        title: str,
+        limit: int,
+        offset: int,
     ):
-        rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to, limit=limit, offset=offset, title=title, location=location)
+        rooms_ids_to_get = rooms_ids_for_booking(
+            date_from=date_from,
+            date_to=date_to,
+            limit=limit,
+            offset=offset,
+            title=title,
+            location=location,
+        )
         hotels_ids_to_get = (
             select(RoomsModel.hotel_id)
             .select_from(RoomsModel)
             .filter(RoomsModel.id.in_(rooms_ids_to_get))
         )
         return await self.get_filtered(HotelsModel.id.in_(hotels_ids_to_get))
-
-

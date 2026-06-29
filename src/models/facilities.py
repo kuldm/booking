@@ -16,8 +16,7 @@ class FacilitiesModel(Base):
     title: Mapped[str] = mapped_column(String(100))
 
     rooms: Mapped[list["RoomsModel"]] = relationship(
-        back_populates="facilities",
-        secondary="rooms_facilities"
+        back_populates="facilities", secondary="rooms_facilities"
     )
 
 

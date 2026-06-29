@@ -27,6 +27,7 @@ from src.utils.db_manager import DBManager
 # Во время прогона тестов сначала прогоняется conftest.py а потом остальные тесты. Поэтому при каждом тесте база будет
 # дропаться и создаваться заново. И обязательно надо подключаться к engine_null_pool как и в селлари
 
+
 @pytest.fixture(scope="session", autouse=True)
 async def check_test_mode() -> None:
     assert settings.MODE == "TEST"
@@ -35,6 +36,7 @@ async def check_test_mode() -> None:
 async def get_db_null_pool() -> DBManager:
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
         yield db
+
 
 # Это непонятный синтаксиси, но генератор может возвращат много много элементов, но в данном случае это будет 1 элемнт.
 @pytest.fixture(scope="function")
@@ -74,22 +76,11 @@ async def ac() -> AsyncClient:
 
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(setup_database, ac) -> None:
-    await ac.post(
-        "/auth/register",
-        json={
-            "email": "lol@mail.com",
-            "password": "1234"
-        }
-    )
+    await ac.post("/auth/register", json={"email": "lol@mail.com", "password": "1234"})
+
 
 @pytest.fixture(scope="session")
 async def authenticated_ac(register_user, ac):
-    await ac.post(
-        "/auth/login",
-        json={
-            "email": "lol@mail.com",
-            "password": "1234"
-        }
-    )
+    await ac.post("/auth/login", json={"email": "lol@mail.com", "password": "1234"})
     assert ac.cookies["access_token"]
     yield ac

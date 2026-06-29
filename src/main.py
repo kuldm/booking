@@ -23,7 +23,6 @@ from src.api.images import router as router_images
 from src.init import redis_manager
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # При старте приложения
