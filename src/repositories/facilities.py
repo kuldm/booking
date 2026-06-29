@@ -1,9 +1,9 @@
-from sqlalchemy import select, func, insert, delete
+from sqlalchemy import select, insert, delete
 
 from src.models.facilities import FacilitiesModel, RoomsFacilitiesModel
 from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import FacilityDataMapper, RoomFacilityDataMapper
-from src.schemas.facilities import Facility, RoomFacility, RoomFacilityAdd
+from src.schemas.facilities import Facility, RoomFacilityAdd
 
 
 class FacilitiesRepository(BaseRepository):

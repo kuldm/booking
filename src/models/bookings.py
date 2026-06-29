@@ -1,7 +1,8 @@
-from datetime import date, datetime
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, DateTime
+from datetime import date
+
+from sqlalchemy import ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from src.database import Base, TimestampMixin

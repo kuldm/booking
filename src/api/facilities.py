@@ -1,10 +1,7 @@
-import json
-
-from fastapi import APIRouter, Query, Body
+from fastapi import APIRouter, Body
 from fastapi_cache.decorator import cache
 
-from src.api.dependencies import PaginationDep, DBDep
-from src.init import redis_manager
+from src.api.dependencies import DBDep
 from src.schemas.facilities import FacilityAdd, FacilityPATCH
 from src.tasks.tasks import test_task
 

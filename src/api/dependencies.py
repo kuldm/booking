@@ -1,8 +1,9 @@
 from typing import Annotated
+
 from fastapi import Depends, Query, Request, HTTPException
 from pydantic import BaseModel
 
-from src.database import session, async_session_maker
+from src.database import async_session_maker
 from src.services.auth import AuthService
 from src.utils.db_manager import DBManager
 

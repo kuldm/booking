@@ -3,8 +3,6 @@ from datetime import date
 from fastapi import APIRouter, Query, Body
 
 from src.api.dependencies import PaginationDep, DBDep
-from src.database import async_session_maker
-from src.repositories.rooms import RoomsRepository
 from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import RoomAdd, RoomAddRequest, RoomPatchRequest, RoomPatch
 

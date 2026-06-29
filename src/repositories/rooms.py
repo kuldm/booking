@@ -1,5 +1,5 @@
 from sqlalchemy import select, func
-from sqlalchemy.orm import selectinload, joinedload
+from sqlalchemy.orm import selectinload
 
 from src.models.rooms import RoomsModel
 from src.repositories.base import BaseRepository

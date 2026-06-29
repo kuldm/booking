@@ -1,7 +1,12 @@
+import typing
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, ForeignKey
 
 from src.database import Base, TimestampMixin
+
+if typing.TYPE_CHECKING:
+    from src.models import FacilitiesModel
 
 
 class RoomsModel(Base, TimestampMixin):

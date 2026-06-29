@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException, Response
 
 from src.api.dependencies import UserIdDep, DBDep
-from src.database import async_session_maker
-from src.repositories.users import UsersRepository
 from src.schemas.users import UserRequestAdd, UserAdd
 from src.services.auth import AuthService
 
@@ -32,7 +30,7 @@ async def register_user(
         new_user_data = UserAdd(email=user_data.email, hashed_password=hashed_password)
         await db.users.add(new_user_data)
         await db.commit()
-    except:
+    except: # noqa: E722
         raise HTTPException(status_code=400)
 
     return {"status": "OK"}
@@ -43,7 +41,7 @@ async def register_user(
     summary="Залогиниться",
     description="<h3>В этой ручке мы входим в систему по логину и паролю<h3>"
 )
-async def register_user(
+async def login_user(
         db: DBDep,
         response: Response,
         user_data: UserRequestAdd = Body(openapi_examples={
