@@ -12,10 +12,12 @@ class DataMapper:
     db_model: type[DBModelType] = None
     schema: type[SchemaType] = None
 
+    # Преобразует SQLAlchemy-объект в Pydantic схему.
     @classmethod
     def map_to_domain_entity(cls, data):
         return cls.schema.model_validate(data, from_attributes=True)
 
+    # Преобразует Pydantic схему в SQLAlchemy-объект.
     @classmethod
     def map_to_persistence_entity(cls, data):
         return cls.db_model(**data.model_dump())
