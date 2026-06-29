@@ -27,10 +27,13 @@ async def register_user(
             }},
         }),
 ):
-    hashed_password = AuthService().hash_password(user_data.password)
-    new_user_data = UserAdd(email=user_data.email, hashed_password=hashed_password)
-    await db.users.add(new_user_data)
-    await db.commit()
+    try:
+        hashed_password = AuthService().hash_password(user_data.password)
+        new_user_data = UserAdd(email=user_data.email, hashed_password=hashed_password)
+        await db.users.add(new_user_data)
+        await db.commit()
+    except:
+        raise HTTPException(status_code=400)
 
     return {"status": "OK"}
 
